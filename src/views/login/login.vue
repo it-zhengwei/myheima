@@ -34,9 +34,10 @@
         <el-form-item>
           <el-button class="btn" type="primary">登录</el-button>
           <br />
-          <el-button class="btn" type="primary">注册</el-button>
+          <el-button class="btn" type="primary" @click="register">注册</el-button>
         </el-form-item>
       </el-form>
+      <register ref="register"></register>
     </div>
     <div class="right">
       <img src="@/assets/img/login_right.png" alt />
@@ -45,7 +46,11 @@
 </template>
 
 <script>
+import register from "@/components/register.vue";
 export default {
+  components: {
+    register
+  },
   data() {
     return {
       form: {
@@ -55,6 +60,11 @@ export default {
         isYes: []
       }
     };
+  },
+  methods: {
+    register() {
+      this.$refs.register.bol = true;
+    }
   }
 };
 </script>
