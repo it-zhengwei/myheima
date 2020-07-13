@@ -83,7 +83,16 @@ export default {
         ],
         code: [
           { required: true, message: "必填", trigger: "change" },
-          { min: 4, max: 4, message: "验证码输入错误", trigger: "blur" },
+          {
+            validator: (rule, value, callback) => {
+              if (/^\d{4}$/.test(value)) {
+                callback()
+              } else {
+                callback(new Error("验证码是4个数字"))
+              }
+            },
+            trigger: "change",
+          },
         ],
         isYes: [{ required: true, message: "必填", trigger: "change" }],
       },
