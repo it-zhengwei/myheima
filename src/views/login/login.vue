@@ -9,18 +9,28 @@
       </div>
       <el-form :model="form" class="form" :rules="rules" ref="form">
         <el-form-item prop="phone">
-          <el-input v-model="form.phone" placeholder="请输入手机号码"></el-input>
+          <el-input
+            v-model="form.phone"
+            placeholder="请输入手机号码"
+          ></el-input>
         </el-form-item>
         <el-form-item prop="password">
-          <el-input v-model="form.password" placeholder="请输入密码" :show-password="true"></el-input>
+          <el-input
+            v-model="form.password"
+            placeholder="请输入密码"
+            :show-password="true"
+          ></el-input>
         </el-form-item>
         <el-form-item prop="code">
           <el-row>
             <el-col :span="16">
-              <el-input v-model="form.code" placeholder="请输入验证码"></el-input>
+              <el-input
+                v-model="form.code"
+                placeholder="请输入验证码"
+              ></el-input>
             </el-col>
             <el-col :span="8">
-              <img class="code" :src="code_image" alt />
+              <img class="code" @click="refresh" :src="code_image" alt />
             </el-col>
           </el-row>
         </el-form-item>
@@ -34,7 +44,9 @@
         <el-form-item>
           <el-button class="btn" type="primary" @click="login">登录</el-button>
           <br />
-          <el-button class="btn" type="primary" @click="register">注册</el-button>
+          <el-button class="btn" type="primary" @click="register"
+            >注册</el-button
+          >
         </el-form-item>
       </el-form>
       <register ref="register"></register>
@@ -46,10 +58,10 @@
 </template>
 
 <script>
-import register from "@/components/register.vue";
+import register from "@/components/register.vue"
 export default {
   components: {
-    register
+    register,
   },
   data() {
     return {
@@ -58,46 +70,50 @@ export default {
         phone: "",
         password: "",
         code: "",
-        isYes: []
+        isYes: [],
       },
       rules: {
         phone: [
           { required: true, message: "必填", trigger: "change" },
-          { min: 11, max: 11, message: "手机号是11位", trigger: "blur" }
+          { min: 11, max: 11, message: "手机号是11位", trigger: "blur" },
         ],
         password: [
           { required: true, message: "必填", trigger: "change" },
-          { min: 6, max: 12, message: "密码字符在6位到12位", trigger: "blur" }
+          { min: 6, max: 12, message: "密码字符在6位到12位", trigger: "blur" },
         ],
         code: [
           { required: true, message: "必填", trigger: "change" },
-          { min: 4, max: 4, message: "验证码输入错误", trigger: "blur" }
+          { min: 4, max: 4, message: "验证码输入错误", trigger: "blur" },
         ],
-        isYes: [{ required: true, message: "必填", trigger: "change" }]
-      }
-    };
+        isYes: [{ required: true, message: "必填", trigger: "change" }],
+      },
+    }
   },
   methods: {
+    refresh() {
+      this.code_image =
+        process.env.VUE_APP_URL + "/captcha?type=login&sdaf=" + Date.now()
+    },
     register() {
-      this.$refs.register.bol = true;
+      this.$refs.register.bol = true
     },
     login() {
-      this.$refs.form.validate(v => {
+      this.$refs.form.validate((v) => {
         if (v) {
           this.$message({
             type: "success",
-            message: "登录成功"
-          });
+            message: "登录成功",
+          })
         } else {
           this.$message({
             type: "error",
-            message: "登录失败"
-          });
+            message: "登录失败",
+          })
         }
-      });
-    }
-  }
-};
+      })
+    },
+  },
+}
 </script>
 
 <style lang="less">
