@@ -88,9 +88,7 @@ router.beforeEach((to, from, next) => {
   //路由离开前开始进度条
   Nprogress.start()
 
-  setTimeout(() => {
-    next()
-  }, 10000)
+  next()
 })
 //后置守卫
 router.afterEach((to) => {
