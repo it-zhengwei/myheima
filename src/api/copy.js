@@ -28,7 +28,7 @@ copy.interceptors.response.use(
       return response.data
     } else if (response.data.code == 206) {
       //这是直接打网址进去或者token超时了  因为强制跳转到首页
-      router.push("/login")
+      router.push("/")
       //返回promise.reject()中止执行后面的then
       return Promise.reject("请登录")
     } else {

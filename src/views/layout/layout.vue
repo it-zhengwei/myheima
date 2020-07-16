@@ -3,16 +3,20 @@
     <el-container>
       <el-header class="Header">
         <ul class="top">
-          <li class="el-icon-s-fold menu" @click="bol=!bol"></li>
+          <li class="el-icon-s-fold menu" @click="bol = !bol"></li>
           <li class="layout_logo">
             <img src="@/assets/img/menu.png" alt />
           </li>
           <li class="Title">黑马面面</li>
           <li class="null"></li>
           <li class="layout_avatar">
-            <img v-if="userList!=''" :src="baseUrl+'/'+userList.avatar" alt />
+            <img
+              v-if="userList != ''"
+              :src="baseUrl + '/' + userList.avatar"
+              alt
+            />
           </li>
-          <li class="username">{{userList.username}},您好</li>
+          <li class="username">{{ userList.username }},您好</li>
           <li class="exit">
             <el-button type="primary" @click="exit">退出</el-button>
           </li>
@@ -58,40 +62,40 @@
 
 <script>
 //导入获取用户信息接口
-import { getUser } from "@/api/getUser.js";
+import { getUser } from "@/api/getUser.js"
 //导入删除token的js
-import { removeItem } from "@/utils/token.js";
+import { removeItem } from "@/utils/token.js"
 export default {
   created() {
     //获取用户信息
-    getUser().then(res => {
+    getUser().then((res) => {
       // window.console.log(res);
       //把响应的信息保存在变量中
-      this.userList = res.data;
-    });
+      this.userList = res.data
+    })
   },
   data() {
     return {
       baseUrl: process.env.VUE_APP_URL,
       bol: false,
-      userList: ""
-    };
+      userList: "",
+    }
   },
   methods: {
     //退出操作
     exit() {
       //提示用户
-      this.$message.success("退出成功");
+      this.$message.success("退出成功")
       //删除token
-      removeItem();
+      removeItem()
       //跳转到登录页
-      this.$router.push("/login");
-    }
-  }
-};
+      this.$router.push("/login")
+    },
+  },
+}
 </script>
 
-<style lang='less'>
+<style lang="less">
 li {
   list-style: none;
 }
@@ -156,7 +160,7 @@ li {
 .main {
   width: 100%;
   height: 769px;
-  background-color: yellow;
+  background-color: #e8e9ec;
 }
 .el-menu-vertical-demo:not(.el-menu--collapse) {
   width: 200px;
