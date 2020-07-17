@@ -20,7 +20,7 @@
         <el-form-item>
           <el-button type="primary" @click="search">搜索</el-button>
           <el-button @click="reset">清除</el-button>
-          <el-button type="primary">+新增学科</el-button>
+          <el-button type="primary" @click="add">+新增学科</el-button>
         </el-form-item>
       </el-form>
     </el-card>
@@ -28,7 +28,7 @@
       <el-table :data="subject">
         <el-table-column label="序号" width="80px">
           <template v-slot="scope">
-            <div>{{ scope.$index + 1 }}</div>
+            <div>{{ (pagination.currentPage-1)*pagination.size+scope.$index + 1 }}</div>
           </template>
         </el-table-column>
         <el-table-column prop="rid" label="学科编号" width="120px"></el-table-column>
@@ -45,7 +45,7 @@
           <template slot-scope="scope">
             <el-button @click="edit(scope.row)">编辑</el-button>
             <el-button @click="status(scope.row.id)">{{scope.row.status==0?'开启':'禁用'}}</el-button>
-            <el-button @click="delete scope.row">删除</el-button>
+            <el-button @click="del(scope.row.id)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -60,14 +60,27 @@
         :total="total"
       ></el-pagination>
     </el-card>
+    <setSubject ref="subject" :mode="mode" @search="search" @getData="getData"></setSubject>
   </div>
 </template>
 
 <script>
-import { getSubject, setStatus } from "@/api/subject/getSubject.js";
+//导入子组件setSubject
+import setSubject from "@/components/setSubject.vue";
+import {
+  getSubject,
+  setStatus,
+  deleteSubject
+} from "@/api/subject/getSubject.js";
 export default {
+  //注册
+  components: {
+    setSubject
+  },
   data() {
     return {
+      //定义一个状态值  是否是新增或者是编辑
+      mode: "",
       total: 0,
       pagination: {
         currentPage: 1, //初始第一页
@@ -94,7 +107,13 @@ export default {
     },
     //编辑
     edit(data) {
-      window.console.log(data);
+      // window.console.log(data);
+      //让状态值为edit
+      this.mode = "edit";
+      //把当前行的数据给子组件的form表单
+      this.$refs.subject.form = JSON.parse(JSON.stringify(data));
+      //弹出对话框
+      this.$refs.subject.isShow = true;
     },
     //删除
     delete(data) {
@@ -145,6 +164,29 @@ export default {
         this.$message.success("设置状态成功");
         //更新数据
         this.getData();
+      });
+    },
+    //新增功能
+    add() {
+      //显示对话框
+      //父传子  获取子组件的isShow
+      this.$refs.subject.isShow = true;
+      //改变状态值为add
+      this.mode = "add";
+    },
+    //删除功能
+    del(id) {
+      //询问用户是否删除
+      this.$confirm("你确定要删除", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消"
+      }).then(() => {
+        deleteSubject({ id }).then(() => {
+          //提示用户
+          this.$message.success("删除成功");
+          //执行搜索功能
+          this.search();
+        });
       });
     }
   },

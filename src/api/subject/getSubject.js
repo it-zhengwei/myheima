@@ -14,4 +14,28 @@ function setStatus(data) {
     data,
   })
 }
-export { getSubject, setStatus }
+//新增学科
+function addSubject(data) {
+  return copy({
+    url: "/subject/add",
+    method: "post",
+    data,
+  })
+}
+//编辑学科
+function editSubject(data) {
+  return copy({
+    url: "/subject/edit",
+    method: "post",
+    data,
+  })
+}
+//删除学科
+function deleteSubject(data) {
+  return copy({
+    url: "/subject/remove",
+    method: "post",
+    data,
+  })
+}
+export { getSubject, setStatus, addSubject, editSubject, deleteSubject }

@@ -49,16 +49,16 @@
 import register from "@/components/register.vue";
 import { login } from "@/api/register.js";
 //导入保存token的js   获取token的js
-import { setItem, getItem } from "@/utils/token.js";
+import { setItem } from "@/utils/token.js";
 export default {
   //如果进入该页面有token 那就强制跳转到layout页面
-  created() {
-    //判断是否有token  主要是针对登录了的用户然后手动去到登录页
-    if (getItem()) {
-      //如果没有值是undefined 就不跳转  如果有token  就跳转到layout页面
-      this.$router.push("/layout");
-    }
-  },
+  // created() {
+  //   //判断是否有token  主要是针对登录了的用户然后手动去到登录页
+  //   // if (getItem()) {
+  //   //   //如果没有值是undefined 就不跳转  如果有token  就跳转到layout页面
+  //   //   // this.$router.push("/layout");
+  //   // }
+  // },
   components: {
     register
   },
