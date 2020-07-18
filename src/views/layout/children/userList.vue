@@ -46,6 +46,16 @@
           </template>
         </el-table-column>
       </el-table>
+      <el-pagination
+        class="pagination"
+        @size-change="sizeChange"
+        @current-change="currentChange"
+        :current-page="page"
+        :page-sizes="[2,10, 20, 30, 40]"
+        :page-size="size"
+        layout="total, sizes, prev, pager, next, jumper"
+        :total="total"
+      ></el-pagination>
     </el-card>
   </div>
 </template>
@@ -54,8 +64,20 @@
 //导入接口
 import { userList } from "@/api/user/user.js";
 export default {
+  methods: {
+    //页容量改变
+    sizeChange(size) {
+      window.console.log(size);
+    },
+    //页码改变
+    currentChange(page) {
+      window.console.log(page);
+    }
+  },
   data() {
     return {
+      page: 1,
+      size: 2,
       userList: [],
       form: {
         username: "",
