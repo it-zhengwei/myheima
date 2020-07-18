@@ -1,7 +1,7 @@
 <template>
   <div class="userList">
     <el-card>
-      <el-form :inline="true" :model="form" label-width="90px">
+      <el-form ref="form" :inline="true" :model="form" label-width="90px">
         <el-form-item label="用户名称" prop="username">
           <el-input v-model="form.username"></el-input>
         </el-form-item>
@@ -17,8 +17,8 @@
           </el-select>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary">搜索</el-button>
-          <el-button>清除</el-button>
+          <el-button type="primary" @click="search">搜索</el-button>
+          <el-button @click="reset">清除</el-button>
           <el-button type="primary">+新增用户</el-button>
         </el-form-item>
       </el-form>
@@ -41,7 +41,7 @@
         <el-table-column label="操作">
           <template v-slot="scope">
             <el-button>编辑</el-button>
-            <el-button>{{scope.row.status==0?'开启':'禁用'}}</el-button>
+            <el-button @click="setStatus(scope.row.id)">{{scope.row.status==0?'开启':'禁用'}}</el-button>
             <el-button>删除</el-button>
           </template>
         </el-table-column>
@@ -62,12 +62,35 @@
 
 <script>
 //导入接口
-import { userList } from "@/api/user/user.js";
+import { userList, update } from "@/api/user/user.js";
 export default {
   methods: {
+    //改变状态
+    setStatus(id) {
+      update({ id }).then(() => {
+        //提示用户
+        this.$message.success("设置状态成功");
+        //刷新数据
+        this.getData();
+      });
+    },
+    //清除功能
+    reset() {
+      //获取form的this 调用它的清空表单信息和表单验证的方法
+      this.$refs.form.resetFields();
+      //刷新数据
+      this.getData();
+    },
+    //搜索功能
+    search() {
+      //默认搜索第一页
+      this.page = 1;
+      this.getData();
+    },
     //封装获取默认页码页容量的方法
     getData() {
       let data = {
+        ...this.form,
         page: this.page,
         limit: this.size
       };
