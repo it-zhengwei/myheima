@@ -19,7 +19,7 @@
         <el-form-item>
           <el-button type="primary" @click="search">搜索</el-button>
           <el-button @click="reset">清除</el-button>
-          <el-button type="primary">+新增用户</el-button>
+          <el-button type="primary" @click="add">+新增用户</el-button>
         </el-form-item>
       </el-form>
     </el-card>
@@ -40,9 +40,9 @@
         </el-table-column>
         <el-table-column label="操作">
           <template v-slot="scope">
-            <el-button>编辑</el-button>
+            <el-button @click="edit(scope.row)">编辑</el-button>
             <el-button @click="setStatus(scope.row.id)">{{scope.row.status==0?'开启':'禁用'}}</el-button>
-            <el-button>删除</el-button>
+            <el-button @click="del(scope.row.id)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -57,14 +57,54 @@
         :total="total"
       ></el-pagination>
     </el-card>
+    <addUser ref="son" @search="search" :mode="mode" @getData="getData"></addUser>
   </div>
 </template>
 
 <script>
+//导入组件
+import addUser from "@/components/addUser.vue";
 //导入接口
-import { userList, update } from "@/api/user/user.js";
+import { userList, update, dele } from "@/api/user/user.js";
 export default {
+  //注册
+  components: {
+    addUser
+  },
   methods: {
+    //删除
+    del(id) {
+      dele({ id }).then(() => {
+        this.$confirm("你确定要删除", "提示", {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning"
+        })
+          .then(() => {
+            this.$message.success("删除成功");
+            //执行搜索功能
+            this.search();
+          })
+          .catch(() => {});
+      });
+    },
+    //编辑
+    edit(data) {
+      //设置状态
+      this.mode = "edit";
+      //把整个表单的数据给子组的form  深拷贝一个值给子组件
+      this.$refs.son.form = JSON.parse(JSON.stringify(data));
+
+      //打开对话框
+      this.$refs.son.isShow = true;
+    },
+    //新增
+    add() {
+      //设置状态
+      this.mode = "add";
+      //打开对话框
+      this.$refs.son.isShow = true;
+    },
     //改变状态
     setStatus(id) {
       update({ id }).then(() => {
@@ -115,6 +155,8 @@ export default {
   },
   data() {
     return {
+      mode: "",
+      total: 0,
       page: 1,
       size: 2,
       userList: [],
