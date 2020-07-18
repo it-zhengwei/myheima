@@ -26,7 +26,7 @@
     <el-card class="footer">
       <el-table :data="userList">
         <el-table-column label="序号" width="70px">
-          <template v-slot="scope">{{scope.$index+1}}</template>
+          <template v-slot="scope">{{(page-1)*size+scope.$index+1}}</template>
         </el-table-column>
         <el-table-column label="用户名" prop="username" width="150px"></el-table-column>
         <el-table-column label="电话" prop="phone" width="150px"></el-table-column>
@@ -65,13 +65,29 @@
 import { userList } from "@/api/user/user.js";
 export default {
   methods: {
+    //封装获取默认页码页容量的方法
+    getData() {
+      let data = {
+        page: this.page,
+        limit: this.size
+      };
+      userList(data).then(res => {
+        // window.console.log(res);
+        this.userList = res.data.items;
+        this.total = res.data.pagination.total;
+      });
+    },
     //页容量改变
     sizeChange(size) {
-      window.console.log(size);
+      // window.console.log(size);
+      this.size = size;
+      this.getData();
     },
     //页码改变
     currentChange(page) {
-      window.console.log(page);
+      // window.console.log(page);
+      this.page = page;
+      this.getData();
     }
   },
   data() {
@@ -87,10 +103,7 @@ export default {
     };
   },
   created() {
-    userList().then(res => {
-      // window.console.log(res);
-      this.userList = res.data.items;
-    });
+    this.getData();
   }
 };
 </script>
