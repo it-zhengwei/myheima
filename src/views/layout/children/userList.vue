@@ -23,22 +23,58 @@
         </el-form-item>
       </el-form>
     </el-card>
+    <el-card class="footer">
+      <el-table :data="userList">
+        <el-table-column label="序号" width="70px">
+          <template v-slot="scope">{{scope.$index+1}}</template>
+        </el-table-column>
+        <el-table-column label="用户名" prop="username" width="150px"></el-table-column>
+        <el-table-column label="电话" prop="phone" width="150px"></el-table-column>
+        <el-table-column label="邮箱" prop="email" width="200px"></el-table-column>
+        <el-table-column label="角色" prop="role" width="150px"></el-table-column>
+        <el-table-column label="备注" prop="remark" width="150px"></el-table-column>
+        <el-table-column label="状态" prop="status" width="100px">
+          <template v-slot="scope">
+            <div :class="{red:scope.row.status==0}">{{scope.row.status==0?'禁用':'开启'}}</div>
+          </template>
+        </el-table-column>
+        <el-table-column label="操作">
+          <template v-slot="scope">
+            <el-button>编辑</el-button>
+            <el-button>{{scope.row.status==0?'开启':'禁用'}}</el-button>
+            <el-button>删除</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+    </el-card>
   </div>
 </template>
 
 <script>
+//导入接口
+import { userList } from "@/api/user/user.js";
 export default {
   data() {
     return {
+      userList: [],
       form: {
         username: "",
         email: "",
         role_id: ""
       }
     };
+  },
+  created() {
+    userList().then(res => {
+      // window.console.log(res);
+      this.userList = res.data.items;
+    });
   }
 };
 </script>
 
-<style>
+<style lang='less'>
+.footer {
+  margin-top: 20px;
+}
 </style>
