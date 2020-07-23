@@ -21,6 +21,7 @@ const router = new VueRouter({
       //配置路由元信息
       meta: {
         title: "登录",
+        roles: ["超级管理员", "管理员", "老师", "学生"],
       },
     },
     //路由重定向
@@ -39,6 +40,7 @@ const router = new VueRouter({
           component: data,
           meta: {
             title: "数据概览",
+            roles: ["超级管理员", "管理员", "老师"],
           },
         },
         {
@@ -46,6 +48,7 @@ const router = new VueRouter({
           component: enterpriseList,
           meta: {
             title: "企业列表",
+            roles: ["超级管理员", "管理员", "老师"],
           },
         },
         {
@@ -53,6 +56,7 @@ const router = new VueRouter({
           component: questionList,
           meta: {
             title: "题库列表",
+            roles: ["超级管理员", "管理员", "老师", "学生"],
           },
         },
         {
@@ -60,6 +64,7 @@ const router = new VueRouter({
           component: subject,
           meta: {
             title: "学科列表",
+            roles: ["超级管理员", "管理员", "老师"],
           },
         },
         {
@@ -67,6 +72,7 @@ const router = new VueRouter({
           component: userList,
           meta: {
             title: "用户列表",
+            roles: ["超级管理员", "管理员"],
           },
         },
       ],
@@ -78,7 +84,12 @@ const router = new VueRouter({
 //设置在导航守卫里 可以给路由跳转一个进度条动画
 import Nprogress from "nprogress"
 import "nprogress/nprogress.css"
-
+//导入vuex
+import store from "@/vuex/index.js"
+//导入message
+import { Message } from "element-ui"
+//导入删除token的工具方法
+import { removeItem } from "@/utils/token.js"
 //设置导航守卫
 //前置守卫  to代表目标路由  from代表当前路由 next表示是否给路由跳转
 //后置守卫  to 代表目标路由 已经进入了目标路由    from代表哪里来的路由
@@ -87,7 +98,15 @@ import "nprogress/nprogress.css"
 router.beforeEach((to, from, next) => {
   //路由离开前开始进度条
   Nprogress.start()
-
+  //跳转前判断是否有权限访问
+  if (!to.meta.roles.includes(store.state.roles)) {
+    //提示用户
+    Message.warning("没有权限访问，请联系管理员")
+    //删除token
+    removeItem()
+    //跳转到登录页
+    next("/login")
+  }
   next()
 })
 //后置守卫

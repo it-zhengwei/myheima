@@ -11,12 +11,12 @@
           <li class="null"></li>
           <li class="layout_avatar">
             <img
-              v-if="userList != ''"
-              :src="baseUrl + '/' + userList.avatar"
+              v-if="$store.state.userList != ''"
+              :src="baseUrl + '/' + $store.state.userList.avatar"
               alt
             />
           </li>
-          <li class="username">{{ userList.username }},您好</li>
+          <li class="username">{{ $store.state.userList.username }},您好</li>
           <li class="exit">
             <el-button type="primary" @click="exit">退出</el-button>
           </li>
@@ -69,9 +69,33 @@ export default {
   created() {
     //获取用户信息
     getUser().then((res) => {
-      // window.console.log(res);
+      // window.console.log(res)
       //把响应的信息保存在变量中
-      this.userList = res.data
+      // this.userList = res.data
+      //把用户信息保存到共享数据管理vuex
+      this.$store.state.userList = res.data
+      //把用户的身份给vuex
+      this.$store.state.roles = res.data.role
+      //因为这是异步请求，还没有完成身份赋值可能就访问了组件了
+      //在这里再验证一次
+      if (!this.$route.meta.roles.includes(this.$store.state.roles)) {
+        //提示用户
+        this.$message.warning("没有权限访问，请联系管理员")
+        // 删除token
+        removeItem()
+        //路由跳转到登录页
+        this.$router.push("/login")
+      } else {
+        //判断是否被禁用
+        if (res.data.status == 0) {
+          //提示用户
+          this.$message.warning("您被冻结了，请联系管理员")
+          // 删除token
+          removeItem()
+          //路由跳转到登录页
+          this.$router.push("/login")
+        }
+      }
     })
   },
   data() {
@@ -84,12 +108,20 @@ export default {
   methods: {
     //退出操作
     exit() {
-      //提示用户
-      this.$message.success("退出成功")
-      //删除token
-      removeItem()
-      //跳转到登录页
-      this.$router.push("/login")
+      this.$confirm("你确定要退出", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning",
+      })
+        .then(() => {
+          //提示用户
+          this.$message.success("退出成功")
+          //删除token
+          removeItem()
+          //跳转到登录页
+          this.$router.push("/login")
+        })
+        .catch(() => {})
     },
   },
 }

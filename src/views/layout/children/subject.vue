@@ -70,12 +70,12 @@ import setSubject from "@/components/setSubject.vue";
 import {
   getSubject,
   setStatus,
-  deleteSubject
+  deleteSubject,
 } from "@/api/subject/getSubject.js";
 export default {
   //注册
   components: {
-    setSubject
+    setSubject,
   },
   data() {
     return {
@@ -84,7 +84,7 @@ export default {
       total: 0,
       pagination: {
         currentPage: 1, //初始第一页
-        size: 2 //初始页容量
+        size: 2, //初始页容量
       },
       //表格的数据  el-table 的 data绑定的数据需要是数组
       subject: [],
@@ -94,8 +94,8 @@ export default {
         limit: "", //	否	string	页尺寸 默认为10
         rid: "", //	否	string	学科编号
         username: "", //	否	string	创建者用户名
-        status: "" //	否	string	状态 0(禁用) 1(启用)
-      }
+        status: "", //	否	string	状态 0(禁用) 1(启用)
+      },
     };
   },
   methods: {
@@ -141,9 +141,9 @@ export default {
         //把form表单的数据展开过来
         ...this.form,
         page: this.pagination.currentPage,
-        limit: this.pagination.size
+        limit: this.pagination.size,
       };
-      getSubject(params).then(res => {
+      getSubject(params).then((res) => {
         // window.console.log(res)
         //获取到的数据给数组
         this.subject = res.data.items;
@@ -179,7 +179,8 @@ export default {
       //询问用户是否删除
       this.$confirm("你确定要删除", "提示", {
         confirmButtonText: "确定",
-        cancelButtonText: "取消"
+        cancelButtonText: "取消",
+        type: "warning",
       }).then(() => {
         deleteSubject({ id }).then(() => {
           //提示用户
@@ -188,11 +189,11 @@ export default {
           this.search();
         });
       });
-    }
+    },
   },
   created() {
     this.getData();
-  }
+  },
 };
 </script>
 
