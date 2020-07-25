@@ -1,8 +1,8 @@
 <template>
   <div class="questionList">
     <el-card>
-      <el-form ref="form" :model="form" label-width="75px" :inline="true">
-        <el-form-item label="学科">
+      <el-form ref="form" :model="form" label-width="70px" :inline="true">
+        <el-form-item label="学科" prop="subject">
           <el-select v-model="form.subject" placeholder="请选择学科">
             <el-option
               :label="item.name"
@@ -12,7 +12,7 @@
             ></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="阶段">
+        <el-form-item label="阶段" prop="step">
           <el-select v-model="form.step" placeholder="请选择阶段">
             <el-option
               :label="item"
@@ -22,7 +22,7 @@
             ></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="企业">
+        <el-form-item label="企业" prop="enterprise">
           <el-select v-model="form.enterprise" placeholder="请选择企业">
             <el-option
               :label="item.name"
@@ -32,7 +32,7 @@
             ></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="题型">
+        <el-form-item label="题型" prop="type">
           <el-select v-model="form.type" placeholder="请选择题型">
             <el-option
               :label="item"
@@ -42,7 +42,7 @@
             ></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="难度">
+        <el-form-item label="难度" prop="difficulty">
           <el-select v-model="form.difficulty" placeholder="请选择难度">
             <el-option
               :label="item"
@@ -52,16 +52,16 @@
             ></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="作者">
+        <el-form-item label="作者" prop="username">
           <el-input v-model="form.username" class="username"></el-input>
         </el-form-item>
-        <el-form-item label="状态">
+        <el-form-item label="状态" prop="status">
           <el-select v-model="form.status" placeholder="请选择状态">
             <el-option label="禁用" value="0"></el-option>
             <el-option label="启用" value="1"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="日期">
+        <el-form-item label="日期" prop="create_data">
           <el-date-picker
             v-model="form.create_data"
             type="date"
@@ -69,13 +69,13 @@
           >
           </el-date-picker>
         </el-form-item>
-        <el-form-item label="标题">
+        <el-form-item label="标题" prop="title">
           <el-input v-model="form.title" class="txt"></el-input>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="search">搜索</el-button>
-          <el-button @click="reSet">清除</el-button>
-          <el-button type="primary">+新增试题</el-button>
+          <el-button @click="reset">清除</el-button>
+          <el-button type="primary" @click="add">+新增试题</el-button>
         </el-form-item>
       </el-form>
     </el-card>
@@ -118,9 +118,13 @@
           width="80px"
         ></el-table-column>
         <el-table-column label="操作">
-          <el-button type="text">编辑</el-button>
-          <el-button type="text">启用</el-button>
-          <el-button type="text">删除</el-button>
+          <template v-slot="scope">
+            <el-button type="text" @click="edit(scope.row)">编辑</el-button>
+            <el-button type="text" @click="setStatus(scope.row.id)">{{
+              scope.row.status == 0 ? '启用' : '禁用'
+            }}</el-button>
+            <el-button type="text" @click="del(scope.row.id)">删除</el-button>
+          </template>
         </el-table-column>
       </el-table>
       <el-pagination
@@ -135,19 +139,37 @@
       >
       </el-pagination>
     </el-card>
+    <question
+      :mode="mode"
+      @getData="getData"
+      @search="search"
+      ref="question"
+      :subjectArr="subjectArr"
+      :enterArr="enterArr"
+      :stepArr="stepArr"
+      :questionArr="questionArr"
+      :difficultyArr="difficultyArr"
+    ></question>
   </div>
 </template>
 
 <script>
+//导入对话框组件
+import question from '@/components/question.vue'
 //导入学科列表接口
 import { getSubject } from '@/api/subject/getSubject.js'
 //导入企业列表接口
 import { getEnter } from '@/api/enterpriseList/getEnter.js'
 //导入题库列表接口
-import { getQuestion } from '@/api/question/index.js'
+import { getQuestion, status, dele } from '@/api/question/index.js'
 export default {
+  //注册
+  components: {
+    question
+  },
   data () {
     return {
+      mode: '',
       form: {
         subject: '', //学科,
         step: '', //阶段
@@ -180,8 +202,48 @@ export default {
     }
   },
   methods: {
+    //编辑
+    edit (data) {
+      this.$refs.question.form = data
+      //改变状态
+      this.mode = 'edit'
+      //打开对话框
+      this.$refs.question.isShow = true
+    },
+    //新增
+    add () {
+      this.mode = 'add'
+      //打开对话框
+      this.$refs.question.isShow = true
+    },
+    //删除功能
+    del (id) {
+      dele({ id }).then(() => {
+        this.$confirm('你确定要删除', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        })
+          .then(() => {
+            //提示用户
+            this.$message.success('删除成功')
+            //更新数据
+            this.search()
+          })
+          .catch(() => {})
+      })
+    },
+    //设置状态
+    setStatus (id) {
+      status({ id }).then(() => {
+        //提示用户
+        this.$message.success('设置状态成功')
+        //更新数据
+        this.getData()
+      })
+    },
     //清除表单功能
-    reSet () {
+    reset () {
       this.$refs.form.resetFields()
       //执行搜索
       this.search()
@@ -202,6 +264,11 @@ export default {
       getQuestion(data).then(res => {
         // window.console.log(res)
         this.tableList = res.data.items
+        this.tableList.forEach(v => {
+          window.console.log(v.city)
+          v.city = v.city.split(',')
+          v.multiple_select_answer = v.multiple_select_answer.split(',')
+        })
         this.total = res.data.pagination.total
       })
     },
@@ -257,7 +324,7 @@ export default {
     width: 220px;
   }
   .txt {
-    width: 400px;
+    width: 300px;
   }
   .content {
     margin-top: 20px;
